@@ -1,0 +1,33 @@
+<%= form_with model: post do |form| %>
+  <% if post.errors.any? %>
+    <div class="errors">
+      <ul>
+        <% post.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :title %>
+    <%= form.text_field :title, autofocus: true, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :body, "Body" %>
+    <%# Drag or paste an image straight into the editor: Trix uploads it via
+        Active Storage and it renders through the 800px variant. %>
+    <%= form.rich_text_area :body %>
+  </div>
+
+  <div class="field field--inline">
+    <%= form.check_box :published %>
+    <%= form.label :published, "Published" %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit post.persisted? ? "Save" : "Create post" %>
+    <%= link_to "Cancel", post.persisted? ? post_path(post) : posts_path %>
+  </div>
+<% end %>

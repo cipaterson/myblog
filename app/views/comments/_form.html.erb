@@ -1,0 +1,37 @@
+<h3>Leave a comment</h3>
+
+<%= form_with model: [ post, comment ], url: post_comments_path(post) do |form| %>
+  <% if comment.errors.any? %>
+    <div class="errors">
+      <ul>
+        <% comment.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :author_name, "Name" %>
+    <%= form.text_field :author_name, required: true, maxlength: 60 %>
+  </div>
+
+  <div class="field">
+    <%= form.label :body, "Comment" %>
+    <%= form.text_area :body, rows: 5, required: true, maxlength: 5000 %>
+  </div>
+
+  <%# Honeypot: hidden from humans by CSS, irresistible to bots. %>
+  <div class="nickname-field" aria-hidden="true">
+    <%= label_tag :nickname, "Leave this field blank" %>
+    <%= text_field_tag :nickname, nil, tabindex: -1, autocomplete: "off" %>
+  </div>
+
+  <%# Signed render time, so a submission faster than a human can type is rejected. %>
+  <%= hidden_field_tag :form_rendered_at,
+        Rails.application.message_verifier(:comment_form).generate(Time.current.to_i) %>
+
+  <div class="actions">
+    <%= form.submit "Post comment" %>
+  </div>
+<% end %>

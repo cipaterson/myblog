@@ -1,0 +1,4 @@
+one:
+  post: published
+  author_name: Existing Commenter
+  body: A comment that already exists.

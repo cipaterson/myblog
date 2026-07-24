@@ -1,0 +1,12 @@
+<%# Overrides the Action Text default so every inline image renders through the
+    single 800px-wide variant defined in InlineImage::VARIANT, instead of the
+    stock 1024x768 / 800x600 pair. The original blob is left untouched. %>
+<figure class="attachment attachment--<%= blob.representable? ? "preview" : "file" %> attachment--<%= blob.filename.extension %>">
+  <% if blob.representable? %>
+    <%= image_tag blob.representation(**InlineImage::VARIANT), loading: "lazy", alt: blob.try(:caption).presence || blob.filename.base %>
+  <% end %>
+
+  <% if caption = blob.try(:caption).presence %>
+    <figcaption class="attachment__caption"><%= caption %></figcaption>
+  <% end %>
+</figure>

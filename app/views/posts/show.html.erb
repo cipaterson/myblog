@@ -1,0 +1,29 @@
+<% content_for :title, "#{@post.title} — #{Blog::NAME}" %>
+
+<article>
+  <h1><%= @post.title %></h1>
+
+  <p class="meta">
+    <time datetime="<%= @post.date.iso8601 %>"><%= @post.date.strftime("%d %B %Y") %></time>
+    <% unless @post.published? %>
+      <span class="badge">Draft</span>
+    <% end %>
+    <% if authenticated? %>
+      &middot; <%= link_to "Edit", edit_post_path(@post) %>
+      &middot; <%= link_to "Delete", @post, data: { turbo_method: :delete, turbo_confirm: "Delete this post?" } %>
+    <% end %>
+  </p>
+
+  <%# Fully qualified: this template also renders from CommentsController. %>
+  <%= render "posts/body", post: @post %>
+</article>
+
+<section class="comments">
+  <h2><%= pluralize(@post.comments.count, "comment") %></h2>
+
+  <% @post.comments.chronological.each do |comment| %>
+    <%= render comment %>
+  <% end %>
+
+  <%= render "comments/form", post: @post, comment: @comment %>
+</section>

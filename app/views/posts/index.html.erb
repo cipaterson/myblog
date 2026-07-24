@@ -1,0 +1,17 @@
+<% content_for :title, Blog::NAME %>
+
+<% if @posts.any? %>
+  <ul class="post-list">
+    <% @posts.each do |post| %>
+      <li>
+        <%= link_to post.title, post %>
+        <% unless post.published? %>
+          <span class="badge">Draft</span>
+        <% end %>
+        <time datetime="<%= post.date.iso8601 %>"><%= post.date.strftime("%d %b %Y") %></time>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p class="empty">Nothing here yet.</p>
+<% end %>

@@ -1,0 +1,9 @@
+published:
+  title: A published post
+  slug: a-published-post
+  published_at: <%= 2.days.ago.to_fs(:db) %>
+
+# No published_at, so this one is a draft.
+draft:
+  title: A draft post
+  slug: a-draft-post
