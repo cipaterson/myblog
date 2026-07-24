@@ -67,6 +67,71 @@ rather than a fresh transform:
 the next time it renders — no re-uploading. Uploads are restricted to PNG, JPEG,
 GIF and WebP under 10 MB (`Post#embeds_must_be_reasonable_images`).
 
+## Where uploads are stored
+
+| Environment | Service | Location |
+|---|---|---|
+| development | `:local` | `storage/` on disk |
+| test | `:test` | `tmp/storage/` |
+| production | `:digitalocean` | DigitalOcean Spaces |
+
+No credentials are needed to develop or run the tests — only production talks to
+Spaces.
+
+### Production setup
+
+Spaces is S3-compatible, so `config/storage.yml` uses Active Storage's stock `S3`
+service with a regional endpoint. It reads everything from encrypted credentials:
+
+```sh
+bin/rails credentials:edit
+```
+
+```yaml
+digitalocean:
+  access_key_id: ...
+  secret_access_key: ...
+  region: nyc3          # also used to build the endpoint hostname
+  bucket: ...
+```
+
+`RAILS_MASTER_KEY` is already passed to production in `config/deploy.yml`, so
+nothing further is needed on the server.
+
+**CORS must be configured on the Space.** Action Text uses *direct uploads* — the
+browser `PUT`s the file straight to Spaces, bypassing Rails — so without CORS,
+dragging an image into the editor fails in production even though everything else
+works. In the Space's Settings → CORS allow:
+
+- Origin `https://blog.firstsoftware.cc`, methods `GET` and `PUT`
+- Headers `Content-Type`, `Content-MD5`, `Content-Disposition`
+
+The service is configured `public: true`, so objects are uploaded world-readable
+and served from permanent, cacheable, unsigned URLs
+(`https://<bucket>.<region>.digitaloceanspaces.com/<key>`) rather than expiring
+signed ones. Don't add `upload: cache_control:` to the service config — it is
+splatted into the presigned PUT without a matching request header, which breaks
+direct uploads with a signature mismatch. Set cache TTL at the CDN instead.
+
+To smoke-test credentials without deploying:
+
+```sh
+bin/rails runner - <<'RUBY'
+require "net/http"
+ActiveStorage::Blob # populates service_configurations via an on_load hook
+svc = ActiveStorage::Service.configure(
+  :digitalocean, Rails.application.config.active_storage.service_configurations
+)
+key = "smoke-test-#{SecureRandom.hex(4)}"
+svc.upload(key, StringIO.new("hello"))
+puts "GET: #{Net::HTTP.get_response(URI(svc.url(key))).code} (expect 200)"
+svc.delete(key)
+RUBY
+```
+
+Note the SQLite databases still live on the server's disk via the Kamal volume
+`/var/data/myblog/storage` — only uploaded files moved to Spaces.
+
 ## Posts
 
 Posts have a `slug` for permanent URLs (`/posts/my-first-post`), generated from

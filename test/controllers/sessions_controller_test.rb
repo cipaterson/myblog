@@ -8,6 +8,14 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "/login is an alias for the login form" do
+    get login_path
+
+    assert_equal "/login", path
+    assert_response :success
+    assert_select "form[action=?]", session_path
+  end
+
   test "create with valid credentials" do
     post session_path, params: { email_address: @user.email_address, password: "password" }
 

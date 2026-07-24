@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
   resource :session, only: %i[ new create destroy ]
 
+  # Friendlier alias for the login form; /session/new still works.
+  get "login", to: "sessions#new", as: :login
+
   resources :posts do
     resources :comments, only: :create
   end

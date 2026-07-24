@@ -6,22 +6,19 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
-# Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
-# amazon:
-#   service: S3
-#   access_key_id: <%= Rails.application.credentials.dig(:aws, :access_key_id) %>
-#   secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) %>
-#   region: us-east-1
-#   bucket: your_own_bucket-<%= Rails.env %>
-
-# Remember not to checkin your GCS keyfile to a repository
-# google:
-#   service: GCS
-#   project: your_project
-#   credentials: <%= Rails.root.join("path/to/gcs.keyfile") %>
-#   bucket: your_own_bucket-<%= Rails.env %>
-
-# mirror:
-#   service: Mirror
-#   primary: local
-#   mirrors: [ amazon, google, microsoft ]
+# DigitalOcean Spaces, used in production. Spaces is S3-compatible, so this uses
+# Active Storage's stock S3 service with a regional endpoint.
+#
+# `public: true` makes uploads world-readable and produces permanent, unsigned
+# URLs straight from the bucket — right for a blog, where the images are public
+# anyway, and far more cacheable than expiring signed URLs.
+#
+# Set these with `bin/rails credentials:edit` (see README).
+digitalocean:
+  service: S3
+  access_key_id:     <%= Rails.application.credentials.dig(:digitalocean, :access_key_id) %>
+  secret_access_key: <%= Rails.application.credentials.dig(:digitalocean, :secret_access_key) %>
+  region:            <%= Rails.application.credentials.dig(:digitalocean, :region) %>
+  bucket:            <%= Rails.application.credentials.dig(:digitalocean, :bucket) %>
+  endpoint:          https://<%= Rails.application.credentials.dig(:digitalocean, :region) %>.digitaloceanspaces.com
+  public: true
