@@ -1,10 +1,9 @@
-<%# After PreprocessEmbedsJob runs the blob's stored file is already the resized
-    800px version, served directly. Falls back to a variant for the brief window
-    before the job completes. %>
+<%# Direct uploads land public-read (see s3_direct_upload_acl.rb), so blob.url
+    works immediately. PreprocessEmbedsJob later replaces the file in-place with
+    the 800px resized version at the same URL. No variants are ever created. %>
 <figure class="attachment attachment--<%= blob.representable? ? "preview" : "file" %> attachment--<%= blob.filename.extension %>">
   <% if blob.representable? %>
-    <% src = blob.metadata["resized"] ? blob.url : blob.representation(**InlineImage::VARIANT) %>
-    <%= image_tag src, loading: "lazy", alt: blob.try(:caption).presence || blob.filename.base %>
+    <%= image_tag blob.url, loading: "lazy", alt: blob.try(:caption).presence || blob.filename.base %>
   <% end %>
 
   <% if caption = blob.try(:caption).presence %>
