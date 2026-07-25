@@ -28,7 +28,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     assert_no_difference "Comment.count" do
       post post_comments_url(@draft), params: comment_params
     end
-    assert_response :not_found
+    assert_redirected_to root_path
   end
 
   test "a blank comment is rejected" do

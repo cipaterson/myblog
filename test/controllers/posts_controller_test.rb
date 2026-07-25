@@ -31,9 +31,9 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "a draft is not found for guests" do
+  test "a draft redirects guests to root" do
     get post_url(@draft)
-    assert_response :not_found
+    assert_redirected_to root_path
   end
 
   test "the admin can preview a draft" do
