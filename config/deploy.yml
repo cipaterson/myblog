@@ -84,7 +84,8 @@ builder:
   # Build on the server itself. This machine is arm64, so building amd64 locally
   # would run every Dockerfile command under QEMU emulation, which segfaults on
   # apt-get. Building on the amd64 target is native, and much faster besides.
-  remote: ssh://root@blog.firstsoftware.cc
+  # It also requires more than 1GB RAM to avoid OOM kills (in my testing).
+  #remote: ssh://root@blog.firstsoftware.cc
 
   #
   # # Pass arguments and secrets to the Docker build process
