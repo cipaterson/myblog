@@ -1,0 +1,10 @@
+dbs:
+  - path: <%= Rails.root.join("storage/production.sqlite3") %>
+    replicas:
+      - type: s3
+        bucket: ${LITESTREAM_REPLICA_BUCKET}
+        path: litestream/production
+        region: ${LITESTREAM_REPLICA_REGION}
+        endpoint: ${LITESTREAM_REPLICA_ENDPOINT}
+        access-key-id: ${LITESTREAM_ACCESS_KEY_ID}
+        secret-access-key: ${LITESTREAM_SECRET_ACCESS_KEY}

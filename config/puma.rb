@@ -37,6 +37,9 @@ plugin :tmp_restart
 # Run the Solid Queue supervisor inside of Puma for single-server deployments.
 plugin :solid_queue if ENV["SOLID_QUEUE_IN_PUMA"]
 
+# Stream WAL frames from the primary SQLite database to DigitalOcean Spaces.
+plugin :litestream if ENV["RAILS_ENV"] == "production"
+
 # Run the supervisor within the Puma process to save memory
 solid_queue_mode :async if ENV["SOLID_QUEUE_IN_PUMA"]
 
