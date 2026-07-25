@@ -1,5 +1,5 @@
 dbs:
-  - path: <%= Rails.root.join("storage/production.sqlite3") %>
+  - path: storage/production.sqlite3
     replicas:
       - type: s3
         bucket: ${LITESTREAM_REPLICA_BUCKET}
