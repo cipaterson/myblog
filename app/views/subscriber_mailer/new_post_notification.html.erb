@@ -1,0 +1,10 @@
+<p>A new post is up on <%= Blog::NAME %>:</p>
+
+<p><strong><a href="<%= @post_url %>"><%= @post.title %></a></strong></p>
+
+<p><a href="<%= @post_url %>"><%= @post_url %></a></p>
+
+<p style="color:#6b6b6b;font-size:0.875em;margin-top:2em;">
+  You're receiving this because you subscribed to <%= Blog::NAME %>.<br>
+  <a href="<%= @unsubscribe_url %>" style="color:#6b6b6b;">Unsubscribe</a>
+</p>

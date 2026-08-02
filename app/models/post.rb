@@ -11,6 +11,7 @@ class Post < ApplicationRecord
   scope :newest_first, -> { order(Arel.sql("COALESCE(published_at, created_at) DESC")) }
 
   after_commit :preprocess_embeds, on: %i[ create update ]
+  after_commit :notify_subscribers_of_publish, on: :update
 
   # Friendly URLs: /posts/my-first-post rather than /posts/1.
   def to_param
@@ -66,5 +67,11 @@ class Post < ApplicationRecord
 
     def preprocess_embeds
       PreprocessEmbedsJob.perform_later(self)
+    end
+
+    def notify_subscribers_of_publish
+      if saved_change_to_published_at? && published_at.present? && published_at_before_last_save.nil?
+        NotifySubscribersJob.perform_later(self)
+      end
     end
 end

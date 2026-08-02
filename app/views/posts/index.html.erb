@@ -15,3 +15,13 @@
 <% else %>
   <p class="empty">Nothing here yet.</p>
 <% end %>
+
+<section class="subscribe">
+  <p class="subscribe__label">Get new posts by email</p>
+  <%= form_with url: subscribe_path, method: :post do |form| %>
+    <div class="subscribe__row">
+      <%= form.email_field :email, placeholder: "you@example.com", required: true, aria: { label: "Email address" } %>
+      <%= form.submit "Subscribe" %>
+    </div>
+  <% end %>
+</section>

@@ -339,6 +339,31 @@ button:hover, input[type="submit"]:hover { opacity: 0.85; }
 
 .errors ul { margin: 0; padding-left: 1.25rem; }
 
+/* ---------- subscribe ---------- */
+
+.subscribe {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+}
+
+.subscribe__label {
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: var(--muted);
+}
+
+.subscribe__row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.subscribe__row input[type="email"] {
+  width: auto;
+  flex: 1;
+}
+
 /* ---------- footer ---------- */
 
 .footer {
