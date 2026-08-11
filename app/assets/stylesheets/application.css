@@ -299,6 +299,11 @@ button:hover, input[type="submit"]:hover { opacity: 0.85; }
   border-bottom: 1px solid var(--rule);
 }
 
+.comment--reply {
+  border-bottom: 0;
+  padding: 0.875rem 0 0;
+}
+
 .comment__head {
   display: flex;
   align-items: baseline;
@@ -311,7 +316,29 @@ button:hover, input[type="submit"]:hover { opacity: 0.85; }
   font-size: 0.9375rem;
 }
 
+.badge--author {
+  border-color: currentColor;
+}
+
 .comment__body { margin: 0; white-space: pre-wrap; }
+
+.comment__actions {
+  margin-top: 0.625rem;
+}
+
+.comment__reply-form {
+  margin-top: 1rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--rule);
+}
+
+.comment__replies {
+  margin: 0.875rem 0 0 1.25rem;
+  padding-left: 1.25rem;
+  border-left: 1px solid var(--rule);
+}
+
+.hidden { display: none; }
 
 .comment:target {
   background: color-mix(in srgb, var(--fg) 5%, transparent);

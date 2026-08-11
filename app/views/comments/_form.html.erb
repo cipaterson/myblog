@@ -1,4 +1,4 @@
-<h3>Leave a comment</h3>
+<h3><%= local_assigns[:title] || "Leave a comment" %></h3>
 
 <%= form_with model: [ post, comment ], url: post_comments_path(post) do |form| %>
   <% if comment.errors.any? %>
@@ -9,6 +9,10 @@
         <% end %>
       </ul>
     </div>
+  <% end %>
+
+  <% if comment.parent_id? %>
+    <%= form.hidden_field :parent_id %>
   <% end %>
 
   <div class="field">
@@ -32,6 +36,6 @@
         Rails.application.message_verifier(:comment_form).generate(Time.current.to_i) %>
 
   <div class="actions">
-    <%= form.submit "Post comment" %>
+    <%= form.submit local_assigns[:submit_label] || "Post comment" %>
   </div>
 <% end %>

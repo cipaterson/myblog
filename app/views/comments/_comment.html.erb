@@ -1,6 +1,11 @@
-<article class="comment" id="comment-<%= comment.id %>">
+<article class="comment <%= "comment--reply" if comment.parent_id? %>" id="comment-<%= comment.id %>">
   <div class="comment__head">
-    <span class="comment__author"><%= comment.author_name %></span>
+    <span class="comment__author">
+      <%= comment.author_name %>
+      <% if comment.author? %>
+        <span class="badge badge--author" title="Written by the blog's author">Author</span>
+      <% end %>
+    </span>
     <time class="meta" datetime="<%= comment.created_at.iso8601 %>"><%= comment.created_at.strftime("%d %b %Y") %></time>
     <% if authenticated? %>
       <%= button_to "Delete", comment_path(comment), method: :delete,
@@ -10,4 +15,25 @@
   </div>
 
   <p class="comment__body"><%= comment.body %></p>
+
+  <% unless comment.parent_id? %>
+    <div class="comment__actions" data-controller="reply">
+      <%= button_tag "Reply", type: "button", class: "button--plain",
+                     data: { reply_target: "toggle", action: "reply#toggle" } %>
+
+      <div class="comment__reply-form" data-reply-target="form" <%= "hidden" unless local_assigns[:reply_errors] %>>
+        <%= render "comments/form",
+                   post: comment.post,
+                   comment: local_assigns[:reply_errors] || Comment.new(parent: comment),
+                   title: "Reply to #{comment.author_name}",
+                   submit_label: "Post reply" %>
+      </div>
+    </div>
+  <% end %>
+
+  <% if comment.replies.any? %>
+    <div class="comment__replies">
+      <%= render comment.replies.chronological %>
+    </div>
+  <% end %>
 </article>

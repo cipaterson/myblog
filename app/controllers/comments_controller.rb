@@ -14,7 +14,7 @@ class CommentsController < ApplicationController
       return
     end
 
-    @comment = Comment.new(comment_params.merge(post: @post))
+    @comment = Comment.new(comment_params.merge(post: @post, author: !!authenticated?))
 
     if @comment.save
       redirect_to post_path(@post, anchor: "comment-#{@comment.id}"), notice: "Comment posted."
@@ -45,6 +45,6 @@ class CommentsController < ApplicationController
     end
 
     def comment_params
-      params.expect(comment: [ :author_name, :body ])
+      params.expect(comment: [ :author_name, :body, :parent_id ])
     end
 end

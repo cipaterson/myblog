@@ -21,9 +21,11 @@
 <section class="comments">
   <h2><%= pluralize(@post.comments.count, "comment") %></h2>
 
-  <% @post.comments.chronological.each do |comment| %>
-    <%= render comment %>
+  <% @post.comments.top_level.chronological.each do |comment| %>
+    <%= render comment, reply_errors: (@comment if @comment_error && @comment.parent_id == comment.id) %>
   <% end %>
 
-  <%= render "comments/form", post: @post, comment: @comment %>
+  <% if @comment.parent_id.blank? %>
+    <%= render "comments/form", post: @post, comment: @comment %>
+  <% end %>
 </section>

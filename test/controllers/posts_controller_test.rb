@@ -31,6 +31,14 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "replies are shown nested under their parent with an author badge" do
+    get post_url(@published)
+    assert_response :success
+
+    assert_select "#comment-#{comments(:one).id} .comment__replies #comment-#{comments(:reply).id}"
+    assert_select ".comment--reply .badge--author", text: "Author"
+  end
+
   test "a draft redirects guests to root" do
     get post_url(@draft)
     assert_redirected_to root_path

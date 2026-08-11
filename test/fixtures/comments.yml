@@ -2,3 +2,20 @@ one:
   post: published
   author_name: Existing Commenter
   body: A comment that already exists.
+
+two:
+  post: published
+  author_name: Another Commenter
+  body: A second top-level comment.
+
+reply:
+  post: published
+  parent: one
+  author_name: Author
+  body: A reply to the first comment.
+  author: true
+
+draft_comment:
+  post: draft
+  author_name: Drafty
+  body: A comment on the draft.
