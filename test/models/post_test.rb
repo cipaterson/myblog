@@ -48,6 +48,54 @@ class PostTest < ActiveSupport::TestCase
     assert_equal original, post.published_at
   end
 
+  test "the publication date can be chosen instead of defaulting to now" do
+    chosen = Time.utc(2019, 3, 14, 9, 30)
+
+    post = Post.create!(title: "Backdated", published_at: chosen, published: "1")
+
+    assert_equal chosen, post.published_at
+    assert_equal chosen, post.date
+  end
+
+  test "a published post with a blank date falls back to now" do
+    post = Post.create!(title: "Undated", published_at: nil, published: "1")
+
+    assert_in_delta Time.current, post.published_at, 5
+  end
+
+  test "unpublishing discards the publication date" do
+    post = Post.create!(title: "Retracted", published_at: Time.utc(2019, 3, 14), published: "1")
+
+    post.published = "0"
+
+    assert_nil post.published_at
+    assert_not post.published?
+  end
+
+  test "a date on an unpublished post is ignored" do
+    post = Post.create!(title: "Future", published_at: Time.utc(2019, 3, 14), published: "0")
+
+    assert_nil post.published_at
+  end
+
+  test "editing the publication date keeps the post published" do
+    post = posts(:published)
+
+    post.update!(published_at: Time.utc(2019, 12, 25, 8), published: "1")
+
+    assert post.reload.published?
+    assert_equal Time.utc(2019, 12, 25, 8), post.published_at
+  end
+
+  test "a chosen publication date reorders the index" do
+    recent = posts(:published)
+    recent.update!(published_at: 1.day.ago, published: "1")
+
+    older = Post.create!(title: "Older", published_at: 6.months.ago, published: "1")
+
+    assert_equal [ recent, older ], Post.published.newest_first.to_a
+  end
+
   test "non-image embeds are rejected" do
     blob = ActiveStorage::Blob.create_and_upload!(
       io: StringIO.new("not an image"), filename: "notes.txt", content_type: "text/plain"

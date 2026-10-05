@@ -21,9 +21,20 @@
     <%= form.rich_text_area :body %>
   </div>
 
-  <div class="field field--inline">
-    <%= form.check_box :published %>
-    <%= form.label :published, "Published" %>
+  <div data-controller="publication-date">
+    <div class="field field--inline">
+      <%= form.check_box :published, data: { publication_date_target: "toggle" } %>
+      <%= form.label :published, "Published" %>
+    </div>
+
+    <%# A date is only meaningful for a published post, so it stays hidden until
+        the checkbox is ticked. Rendered hidden for drafts so it does not flash
+        before Stimulus connects. %>
+    <div class="field" data-publication-date-target="field" <%= "hidden" unless post.published? %>>
+      <%= form.label :published_at, "Publication date" %>
+      <p class="field__hint">Leave blank to date the post from the moment you publish it. Times are UTC.</p>
+      <%= form.datetime_local_field :published_at, include_seconds: false %>
+    </div>
   </div>
 
   <div class="actions">

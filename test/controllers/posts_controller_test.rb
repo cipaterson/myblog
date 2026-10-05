@@ -98,6 +98,70 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     assert_not Post.find_by!(slug: "work-in-progress").published?
   end
 
+  test "the admin can backdate a post when creating it" do
+    sign_in_as @admin
+
+    post posts_url, params: {
+      post: { title: "From the archive", body: "<div>Body</div>",
+              published_at: "2019-03-14T09:30", published: "1" }
+    }
+
+    created = Post.find_by!(slug: "from-the-archive")
+    assert created.published?
+    assert_equal Time.utc(2019, 3, 14, 9, 30), created.published_at
+  end
+
+  test "the admin can backdate an already-published post" do
+    sign_in_as @admin
+    original = @published.published_at
+
+    patch post_url(@published), params: { post: { published_at: "2019-12-25T08:00", published: "1" } }
+
+    @published.reload
+    assert_equal Time.utc(2019, 12, 25, 8, 0), @published.published_at
+    assert_not_equal original, @published.published_at
+  end
+
+  test "a blank publication date publishes the post now" do
+    sign_in_as @admin
+
+    patch post_url(@draft), params: { post: { published_at: "", published: "1" } }
+
+    @draft.reload
+    assert @draft.published?
+    assert_in_delta Time.current, @draft.published_at, 5
+  end
+
+  test "a publication date on an unpublished post is discarded" do
+    sign_in_as @admin
+
+    patch post_url(@draft), params: { post: { published_at: "2019-03-14T09:30", published: "0" } }
+
+    @draft.reload
+    assert_not @draft.published?
+    assert_nil @draft.published_at
+  end
+
+  test "the edit form pre-fills the current publication date" do
+    sign_in_as @admin
+    expected = @published.published_at.strftime("%Y-%m-%dT%H:%M")
+
+    get edit_post_url(@published)
+
+    assert_response :success
+    assert_select "input[type=datetime-local][value=?]", expected
+  end
+
+  test "the publication date field is hidden until the post is published" do
+    sign_in_as @admin
+
+    get edit_post_url(@published)
+    assert_select "[data-publication-date-target=field]:not([hidden])"
+
+    get edit_post_url(@draft)
+    assert_select "[data-publication-date-target=field][hidden]"
+  end
+
   test "the admin can update and delete a post" do
     sign_in_as @admin
 

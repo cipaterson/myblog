@@ -140,7 +140,10 @@ keep working.
 
 A post with no `published_at` is a draft: invisible on the index and a 404 for
 guests, but previewable while logged in. The "Published" checkbox on the post
-form toggles it.
+form toggles it. Ticking the box stamps `published_at` with the current time, so
+a post can be backdated (or postdated) by filling in the publication date field
+that appears alongside it. A blank date means "now", and unticking the box
+clears the date entirely.
 
 ## Comments
 
