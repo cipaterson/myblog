@@ -28,5 +28,7 @@ class PreprocessEmbedsJob < ApplicationJob
 
       blob.variant_records.each(&:destroy)
     end
+
+    post.extract_location!
   end
 end

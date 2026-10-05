@@ -1,0 +1,26 @@
+<% content_for :title, "Map — #{Blog::NAME}" %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" %>
+<% end %>
+
+<h1>Map</h1>
+<p class="meta">Posts with a location, taken from the first photo with GPS.</p>
+
+<div id="map"
+     class="map"
+     data-controller="map"
+     data-map-markers="<%= @posts.map do |post|
+       {
+         lat: post.latitude.to_f,
+         lng: post.longitude.to_f,
+         title: post.title,
+         url: post_path(post),
+         date: post.date.strftime("%d %b %Y"),
+         location_name: post.location_name
+       }
+     end.to_json %>">
+</div>
+
+<% if @posts.none? %>
+  <p class="empty">No posts with a location yet.</p>
+<% end %>

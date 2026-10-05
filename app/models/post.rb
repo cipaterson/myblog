@@ -4,10 +4,12 @@ class Post < ApplicationRecord
 
   validates :title, presence: true, length: { maximum: 200 }
   validate :embeds_must_be_reasonable_images
+  validate :location_must_be_sensible
 
   before_validation :assign_slug, if: -> { slug.blank? && title.present? }
 
   scope :published, -> { where.not(published_at: nil) }
+  scope :located, -> { where.not(latitude: nil).where.not(longitude: nil) }
   scope :newest_first, -> { order(Arel.sql("COALESCE(published_at, created_at) DESC")) }
 
   after_commit :preprocess_embeds, on: %i[ create update ]
@@ -37,6 +39,26 @@ class Post < ApplicationRecord
     published_at || created_at
   end
 
+  # Fills latitude/longitude from the first embedded image that has GPS EXIF.
+  # Never clobbers a manually-entered location. Called by PreprocessEmbedsJob,
+  # which has the original image open (before it is overwritten by the resize).
+  def extract_location!
+    return if location_source == "manual"
+    return if body.blank?
+
+    body.embeds.filter_map(&:blob).select(&:representable?).each do |blob|
+      coordinates = blob.open { |file| PostLocation.from_image(file.path) }
+      next unless coordinates
+
+      update_columns(
+        latitude: coordinates[:latitude],
+        longitude: coordinates[:longitude],
+        location_source: "auto"
+      )
+      return
+    end
+  end
+
   private
     def assign_slug
       base = title.parameterize.presence || "post"
@@ -62,6 +84,16 @@ class Post < ApplicationRecord
         if blob.byte_size > InlineImage::MAX_BYTE_SIZE
           errors.add(:body, "images must be smaller than #{InlineImage::MAX_BYTE_SIZE / 1.megabyte} MB")
         end
+      end
+    end
+
+    def location_must_be_sensible
+      if latitude.present? != longitude.present?
+        errors.add(:base, "latitude and longitude must be set together")
+      elsif latitude.present? && !latitude.between?(-90, 90)
+        errors.add(:latitude, "must be between -90 and 90")
+      elsif longitude.present? && !longitude.between?(-180, 180)
+        errors.add(:longitude, "must be between -180 and 180")
       end
     end
 

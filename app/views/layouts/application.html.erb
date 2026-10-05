@@ -26,6 +26,7 @@
         <p class="masthead__title"><%= link_to Blog::NAME, root_path %></p>
 
         <nav>
+          <%= link_to "Map", map_path %>
           <% if authenticated? %>
             <%= link_to "New post", new_post_path %>
             <%= button_to "Log out", session_path, method: :delete, class: "button--plain" %>

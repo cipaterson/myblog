@@ -4,6 +4,8 @@ Rails.application.routes.draw do
   # Friendlier alias for the login form; /session/new still works.
   get "login", to: "sessions#new", as: :login
 
+  get "map", to: "maps#index"
+
   resources :posts do
     resources :comments, only: :create
   end

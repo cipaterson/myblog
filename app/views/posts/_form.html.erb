@@ -26,6 +26,23 @@
     <%= form.label :published, "Published" %>
   </div>
 
+  <div class="field">
+    <span class="field__label"><%= form.label :location_name, "Location" %></span>
+    <p class="field__hint">Left blank, the location is auto-detected from the first photo with GPS.</p>
+    <%= form.text_field :location_name, placeholder: "e.g. Dolomites", maxlength: 100 %>
+  </div>
+
+  <div class="field field--grid">
+    <div>
+      <%= form.label :latitude %>
+      <%= form.text_field :latitude, inputmode: "decimal", placeholder: "e.g. 46.1234" %>
+    </div>
+    <div>
+      <%= form.label :longitude %>
+      <%= form.text_field :longitude, inputmode: "decimal", placeholder: "e.g. 11.5678" %>
+    </div>
+  </div>
+
   <div class="actions">
     <%= form.submit post.persisted? ? "Save" : "Create post" %>
     <%= link_to "Cancel", post.persisted? ? post_path(post) : posts_path %>

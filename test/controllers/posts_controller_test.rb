@@ -31,6 +31,18 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "a post with an embedded photo renders without ActiveStorage url errors" do
+    blob = ActiveStorage::Blob.create_and_upload!(
+      io: file_fixture("gps.jpg").open, filename: "gps.jpg", content_type: "image/jpeg"
+    )
+    post = Post.create!(title: "With photo", published_at: Time.current,
+                        body: %(<div><action-text-attachment sgid="#{blob.attachable_sgid}"></action-text-attachment></div>))
+
+    get post_url(post)
+    assert_response :success
+    assert_match %r{/rails/active_storage/}, response.body
+  end
+
   test "replies are shown nested under their parent with an author badge" do
     get post_url(@published)
     assert_response :success
@@ -117,6 +129,29 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       post posts_url, params: { post: { title: "", body: "<div>x</div>" } }
     end
     assert_response :unprocessable_content
+  end
+
+  test "a post created with coordinates marks its location as manual" do
+    sign_in_as @admin
+
+    post posts_url, params: {
+      post: { title: "Somewhere", body: "<div>Body</div>", latitude: "46.12", longitude: "11.56" }
+    }
+
+    created = Post.find_by!(slug: "somewhere")
+    assert_equal "manual", created.location_source
+    assert_in_delta 46.12, created.latitude, 1e-7
+  end
+
+  test "blank coordinates clear a location and allow auto-detection again" do
+    sign_in_as @admin
+
+    patch post_url(@published), params: { post: { title: "Retitled", latitude: "", longitude: "" } }
+
+    @published.reload
+    assert_nil @published.latitude
+    assert_nil @published.longitude
+    assert_nil @published.location_source
   end
 
   test "deleting a post deletes its comments" do

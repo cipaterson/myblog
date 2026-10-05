@@ -139,6 +139,21 @@ hr {
   letter-spacing: 0.02em;
 }
 
+/* ---------- map ---------- */
+
+.map {
+  height: 60vh;
+  min-height: 400px;
+  position: relative;
+  z-index: 0;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+}
+
+.map + .empty {
+  margin-top: 1.25rem;
+}
+
 /* ---------- post list ---------- */
 
 .post-list { list-style: none; padding: 0; margin: 0; }
@@ -236,6 +251,19 @@ input:focus, textarea:focus, trix-editor:focus {
 }
 
 .field { margin-bottom: 1.25rem; }
+
+.field__hint {
+  font-size: 0.8125rem;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: var(--muted);
+  margin: -0.2rem 0 0.5rem;
+}
+
+.field--grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
 
 .field--inline {
   display: flex;

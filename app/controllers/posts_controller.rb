@@ -55,6 +55,17 @@ class PostsController < ApplicationController
     end
 
     def post_params
-      params.expect(post: [ :title, :body, :published ])
+      permitted = params.expect(post: [ :title, :body, :published, :latitude, :longitude, :location_name ])
+
+      if permitted[:latitude].present? && permitted[:longitude].present?
+        permitted[:location_source] = "manual"
+      elsif permitted[:latitude].blank? || permitted[:longitude].blank?
+        # Clearing the coordinates lets auto-detection take over again.
+        permitted[:latitude] = nil
+        permitted[:longitude] = nil
+        permitted[:location_source] = nil
+      end
+
+      permitted
     end
 end
