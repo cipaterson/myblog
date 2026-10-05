@@ -2,6 +2,9 @@ published:
   title: A published post
   slug: a-published-post
   published_at: <%= 2.days.ago.to_fs(:db) %>
+  latitude: 43.4674483
+  longitude: 11.8851267
+  location_source: auto
 
 # No published_at, so this one is a draft.
 draft:

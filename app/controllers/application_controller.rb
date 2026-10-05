@@ -1,4 +1,7 @@
 class ApplicationController < ActionController::Base
+  # Rails 8.1 dropped the middleware that set this; blob.url (used for inline
+  # images in _blob.html.erb) needs per-request url_options to build disk URLs.
+  include ActiveStorage::SetCurrent
   include Authentication
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern

@@ -106,8 +106,62 @@ class PostTest < ActiveSupport::TestCase
     assert_match(/PNG, JPEG, GIF or WebP/, post.errors.full_messages.to_sentence)
   end
 
+  # --- location ---
+
+  test "extracts a location from the first photo with GPS" do
+    post = Post.create!(title: "Trip", body: attachment_html(gps_blob))
+
+    post.extract_location!
+
+    assert_equal "auto", post.location_source
+    assert_in_delta 43.46744833, post.latitude, 1e-7
+    assert_in_delta 11.88512667, post.longitude, 1e-7
+  end
+
+  test "does not override a manually-entered location" do
+    post = Post.create!(title: "Trip", body: attachment_html(gps_blob),
+                        latitude: 46.12, longitude: 11.56, location_source: "manual")
+
+    post.extract_location!
+
+    assert_equal "manual", post.location_source
+    assert_in_delta 46.12, post.latitude, 1e-7
+  end
+
+  test "leaves the location blank when no photo has GPS" do
+    post = Post.create!(title: "Trip", body: attachment_html(wide_png_blob))
+
+    post.extract_location!
+
+    assert_nil post.latitude
+    assert_nil post.longitude
+  end
+
+  test "a location needs both coordinates" do
+    assert_not Post.new(title: "Half a location", latitude: 46.12).valid?
+  end
+
+  test "located scope only includes posts with both coordinates" do
+    Post.create!(title: "Somewhere", latitude: 46.12, longitude: 11.56)
+
+    assert_includes Post.located, posts(:published)
+    assert_not_includes Post.located, posts(:draft)
+  end
+
   private
     def attachment_html(blob)
       %(<div><action-text-attachment sgid="#{blob.attachable_sgid}"></action-text-attachment></div>)
+    end
+
+    def gps_blob
+      ActiveStorage::Blob.create_and_upload!(
+        io: file_fixture("gps.jpg").open, filename: "gps.jpg", content_type: "image/jpeg"
+      )
+    end
+
+    def wide_png_blob
+      ActiveStorage::Blob.create_and_upload!(
+        io: file_fixture("wide.png").open, filename: "wide.png", content_type: "image/png"
+      )
     end
 end
