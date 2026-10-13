@@ -4,7 +4,7 @@
 module InlineImage
   VARIANT = { resize_to_limit: [ 800, nil ] }.freeze
 
-  MAX_BYTE_SIZE = 10.megabytes
+  MAX_BYTE_SIZE = 15.megabytes
 
   CONTENT_TYPES = %w[ image/png image/jpeg image/gif image/webp ].freeze
 end
